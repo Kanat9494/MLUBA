@@ -1,8 +1,8 @@
-﻿<nav class="mobile-bottom-nav fixed-bottom" style=@($"visibility: visible")>
+﻿<nav class="mobile-bottom-nav fixed-bottom" style="visibility: visible">
 	<div class="mobile-bottom-nav__item ">
         <a href="" @onclick="HomeStatus" class=@($"nav-link {(isHome ? "mobile-bottom-nav__item--active" : "mobile-bottom-nav__item--inactive")}")>
 			<div class="mobile-bottom-nav__item-content">
-                <i class="fas fa-home fa-2x"></i>
+                <i class="material-icons" style="font-size: 2.5em">home</i>
 				Главная
 			</div>
 		</a>
@@ -11,7 +11,7 @@
     <div class="mobile-bottom-nav__item">
         <a href="counter" @onclick="AccountStatus" class=@($"nav-link {(isAccount ? "mobile-bottom-nav__item--active" : "mobile-bottom-nav__item--inactive")}")>
             <div class="mobile-bottom-nav__item-content">
-                <i class="fas fa-user fa-2x"></i>
+                <i class="material-icons" style="font-size: 2.5em">person</i>
                 Аккаунт
             </div>
         </a>

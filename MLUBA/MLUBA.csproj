@@ -67,4 +67,17 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <MauiImage Include="wwwroot\images\account_icon.png" />
+      <MauiImage Include="wwwroot\images\bell_icon.png" />
+      <MauiImage Include="wwwroot\images\chats_icon.png" />
+      <MauiImage Include="wwwroot\images\home_icon.png" />
+      <MauiImage Include="wwwroot\images\mic_icon.png" />
+      <MauiImage Include="wwwroot\images\next_icon.png" />
+      <MauiImage Include="wwwroot\images\password_icon.png" />
+      <MauiImage Include="wwwroot\images\photo_icon.png" />
+      <MauiImage Include="wwwroot\images\send_icon.png" />
+      <MauiImage Include="wwwroot\images\user_icon.png" />
+    </ItemGroup>
+
 </Project>
