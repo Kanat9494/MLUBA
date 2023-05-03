@@ -1,6 +1,6 @@
-﻿<nav class="mobile-bottom-nav fixed-bottom" style="visibility: visible">
+﻿<nav id="bottom-nav" class="mobile-bottom-nav fixed-bottom" style="visibility: visible">
 	<div class="mobile-bottom-nav__item ">
-        <a href="" @onclick="HomeStatus" class=@($"nav-link {(isHome ? "mobile-bottom-nav__item--active" : "mobile-bottom-nav__item--inactive")}")>
+        <a href="home" @onclick="HomeStatus" class=@($"nav-link {(isHome ? "mobile-bottom-nav__item--active" : "mobile-bottom-nav__item--inactive")}")>
 			<div class="mobile-bottom-nav__item-content">
                 <i class="material-icons" style="font-size: 2.5em">home</i>
 				Главная

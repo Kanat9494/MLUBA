@@ -1,0 +1,53 @@
+﻿@page "/"
+@inject NavigationManager UriHelper
+@inject IJSRuntime JSRuntime
+
+<style>
+    #bottom-nav {
+        display: none;
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-form">
+        <h2>Добро пожаловать</h2>
+        <h4>Войдите для продолжения</h4>
+        <div class="form-group">
+            <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" name="username" placeholder="Введите логин">
+            <small class=@($"{errorLogin}")>Логин не может быть пустым</small>
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password" placeholder="Введите пароль">
+        </div>
+        <button type="submit" @onclick="OnLogin">Войти</button>
+    </div>
+</div>
+
+
+
+@code {
+    private AuthRequest authRequest = new AuthRequest();
+    string userName;
+    string password;
+
+    //Стили
+    string errorLogin = "display: none;";
+
+    private void OnLogin()
+    {
+        if (string.IsNullOrEmpty(userName))
+        {
+            errorLogin = "display: block; color: red;";
+            return;
+        }
+        UriHelper.NavigateTo("home");
+    }
+
+    private async Task CallAlert()
+    {
+        await JSRuntime.InvokeVoidAsync("testAlert");
+    }
+}
+

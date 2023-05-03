@@ -80,4 +80,8 @@
       <MauiImage Include="wwwroot\images\user_icon.png" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Constants\" />
+    </ItemGroup>
+
 </Project>
