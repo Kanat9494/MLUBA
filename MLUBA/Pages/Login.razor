@@ -6,6 +6,19 @@
     #bottom-nav {
         display: none;
     }
+
+    .custom-overlay {
+        position: fixed; /* фиксированная позиция, чтобы не скроллилась вместе с контентом */
+        z-index: 9999; /* задаем z-index для того чтобы элемент был поверх других элементов */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(153, 153, 153, 0.5); /* задаем полупрозрачный цвет фона */
+        display: flex; /* используем flexbox для центрирования содержимого */
+        justify-content: center;
+        align-items: center;
+    }
 </style>
 
 <div class="login-wrapper">
@@ -14,34 +27,51 @@
         <h4>Войдите для продолжения</h4>
         <div class="form-group">
             <label for="username">Имя пользователя:</label>
-            <input type="text" id="username" name="username" placeholder="Введите логин">
-            <small class=@($"{errorLogin}")>Логин не может быть пустым</small>
+            <input type="text" id="username" name="username" placeholder="Введите логин" @bind-value="userName">
+            <small style="@errorLogin">Логин не может быть пустым</small>
         </div>
         <div class="form-group">
             <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password" placeholder="Введите пароль">
+            <input type="password" id="password" name="password" placeholder="Введите пароль" @bind-value="password">
+            <small style="@errorPassword">Пароль не может быть пустым</small>
         </div>
         <button type="submit" @onclick="OnLogin">Войти</button>
     </div>
 </div>
 
+@if (_isLoading)
+{
+    <div class="custom-overlay">
+        <MudProgressCircular Color="Color.Success" Indeterminate="true" Style="color: red !important;"/>
+    </div>
+}
 
 
 @code {
-    private AuthRequest authRequest = new AuthRequest();
     string userName;
     string password;
+    private bool _isLoading = false;
 
     //Стили
     string errorLogin = "display: none;";
+    string errorPassword = "display: none";
 
-    private void OnLogin()
+    private async Task OnLogin()
     {
+        _isLoading = true;
         if (string.IsNullOrEmpty(userName))
         {
             errorLogin = "display: block; color: red;";
+            _isLoading = false;
             return;
         }
+        if (string.IsNullOrEmpty(password))
+        {
+            errorPassword = "display: block; color: red;";
+            _isLoading = false;
+            return;
+        }
+        await Task.Delay(5000);
         UriHelper.NavigateTo("home");
     }
 
