@@ -1,7 +1,116 @@
 ﻿@page "/home"
 
-<h1>Hello, world!</h1>
+<style>
+    .custom-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70px;
+        height: 70px;
+    }
 
-Welcome to your new app.
+    .custom-overlay {
+        position: fixed; /* фиксированная позиция, чтобы не скроллилась вместе с контентом */
+        z-index: 9999; /* задаем z-index для того чтобы элемент был поверх других элементов */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(153, 153, 153, 0.5); /* задаем полупрозрачный цвет фона */
+        display: flex; /* используем flexbox для центрирования содержимого */
+        justify-content: center;
+        align-items: center;
+    }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    .home-wrapper {
+        height: 100%;
+    }
+
+    .column {
+        display: block;
+        /*Making equal spaced divs*/
+        justify-content: space-between;
+    }
+
+    .item {
+        margin-top: 8px;
+    }
+</style>
+
+<div class="home-wrapper">
+    <div style="overflow-x: hidden;">
+        <div>
+            <h2 style="float: left;"><em>MedLink</em></h2>
+
+            <img src="images/icons/bell_icon.png" style="width: 30px; height: 30px; float: right;" />
+        </div>
+
+        <p style="color: #00e600; clear: both; font-size: 15px;">Ваше здоровье в надежных руках</p>
+
+        <h4>Наши доктора:</h4>
+
+
+        @foreach (var item in Doctors)
+        {
+            <hr style="border: 0.5px solid #4dff4d; background: #4dff4d;" />
+
+            <a href="/doctor-details/@item.DoctorId">
+                <div>
+                    <div class="row">
+                        <div class="col-4">
+                            <img src="@item.ProfileImg" style="width: 120px; height: 120px; border-radius: 10%;" />
+                        </div>
+
+                        <div class="col-7 p-0" style="margin-left: 15px; vertical-align: central">
+                            <h6 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="m-0 item mt-1">@item.FullName</h6>
+                            <p style="margin-bottom: 0;" class="item">Стаж работы: @item.WorkExperience</p>
+                            <p style="margin-bottom: 0; color: @(item.IsOnline.Equals("В сети") ? "#00e600" : "red")" class="item">@item.IsOnline</p>
+                            <h6 style="margin-bottom: 0; font-size: larger" class="item">@item.Specialization</h6>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        }
+
+        @if (_isLoading)
+        {
+            <div class="custom-center text-center">
+                <MudProgressCircular Color="Color.Success" Indeterminate="true" Size="Size.Large" />
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private bool _isLoading = true;
+    string _accessToken;
+    private List<Doctor> Doctors = new List<Doctor>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _accessToken = await SecureStorage.Default.GetAsync("UserAccessToken");
+
+        await GetAllDoctors();
+    }
+
+    async Task GetAllDoctors()
+    {
+        try
+        {
+            var response = await ContentService.Instance(_accessToken).GetAllDoctors();
+
+            if (response != null)
+            {
+                foreach (var doctor in response)
+                    Doctors.Add(doctor);
+            }
+
+            _isLoading = false;
+        }
+        catch
+        {
+            _isLoading = false;
+        }
+    }
+}

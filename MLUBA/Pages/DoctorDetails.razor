@@ -1,0 +1,48 @@
+﻿@page "/doctor-details/{doctorId}";
+@inject NavigationManager UriHelper
+
+<style>
+    #bottom-nav {
+        display: none;
+    }
+</style>
+
+<div style="background: #00e600; height: 50px; margin: 0; display: flex; align-items: center;" class="ml-n4 mt-n4 mr-n4">
+    <a href="/home" style="float: left;">
+        <img style="width: 30px; height: 25px; margin-left: 8px;" src="images/icons/back_icon.png" />
+    </a>
+
+    <span style="white-space: nowrap; overflow: hidden; font-size: 18px; color: white; font-weight: bolder;
+        overflow: hidden; text-overflow: ellipsis;" class="ml-3">@_doctor.FullName</span>
+</div>
+
+<img src="@_doctor.ProfileImg" style="width: 100%; height: 300px;"/>
+
+@code {
+    [Parameter]
+    public string DoctorId { get; set; }
+
+    private string _accessToken;
+    private DoctorInfo _doctor = new DoctorInfo();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _accessToken = await SecureStorage.Default.GetAsync("UserAccessToken");
+        await GetDoctorInfoAsync();
+    }
+
+    async Task GetDoctorInfoAsync()
+    {
+        var response = await ContentService.Instance(_accessToken).GetItemAsync<DoctorInfo>($"api/Doctors/GetDoctor/{DoctorId}");
+        await SecureStorage.Default.SetAsync("DoctorId", DoctorId.ToString());
+
+        if (response.StatusCode == 200)
+        {
+            _doctor = response;
+            await SecureStorage.Default.SetAsync("DoctorAccountName", response.AccountName);
+            await SecureStorage.Default.SetAsync("DoctorFullName", response.FullName);
+        }
+        else if (response.StatusCode == 401)
+            UriHelper.NavigateTo("/");
+    }
+}

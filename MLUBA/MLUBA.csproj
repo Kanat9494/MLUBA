@@ -69,20 +69,16 @@
     </ItemGroup>
 
     <ItemGroup>
-      <MauiImage Include="wwwroot\images\account_icon.png" />
-      <MauiImage Include="wwwroot\images\bell_icon.png" />
-      <MauiImage Include="wwwroot\images\chats_icon.png" />
-      <MauiImage Include="wwwroot\images\home_icon.png" />
-      <MauiImage Include="wwwroot\images\mic_icon.png" />
-      <MauiImage Include="wwwroot\images\next_icon.png" />
-      <MauiImage Include="wwwroot\images\password_icon.png" />
-      <MauiImage Include="wwwroot\images\photo_icon.png" />
-      <MauiImage Include="wwwroot\images\send_icon.png" />
-      <MauiImage Include="wwwroot\images\user_icon.png" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Constants\" />
+      <MauiImage Include="wwwroot\images\icons\account_icon.png" />
+      <MauiImage Include="wwwroot\images\icons\bell_icon.png" />
+      <MauiImage Include="wwwroot\images\icons\chats_icon.png" />
+      <MauiImage Include="wwwroot\images\icons\home_icon.png" />
+      <MauiImage Include="wwwroot\images\icons\mic_icon.png" />
+      <MauiImage Include="wwwroot\images\icons\next_icon.png" />
+      <MauiImage Include="wwwroot\images\icons\password_icon.png" />
+      <MauiImage Include="wwwroot\images\icons\photo_icon.png" />
+      <MauiImage Include="wwwroot\images\icons\send_icon.png" />
+      <MauiImage Include="wwwroot\images\icons\user_icon.png" />
     </ItemGroup>
 
 </Project>

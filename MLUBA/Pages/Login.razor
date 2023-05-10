@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject NavigationManager UriHelper
 @inject IJSRuntime JSRuntime
+@inject IDialogService DialogService
 
 <style>
     #bottom-nav {
@@ -19,6 +20,15 @@
         justify-content: center;
         align-items: center;
     }
+
+    .custom-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70px;
+        height: 70px;
+    }
 </style>
 
 <div class="login-wrapper">
@@ -27,30 +37,37 @@
         <h4>Войдите для продолжения</h4>
         <div class="form-group">
             <label for="username">Имя пользователя:</label>
-            <input type="text" id="username" name="username" placeholder="Введите логин" @bind-value="userName">
+            <input type="text" id="username" name="username" placeholder="Введите логин" @bind-value="_userName">
             <small style="@errorLogin">Логин не может быть пустым</small>
         </div>
         <div class="form-group">
             <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password" placeholder="Введите пароль" @bind-value="password">
+            <input type="password" id="password" name="password" placeholder="Введите пароль" @bind-value="_password">
             <small style="@errorPassword">Пароль не может быть пустым</small>
         </div>
-        <button type="submit" @onclick="OnLogin">Войти</button>
+        
+        <div style="width: 100%" class="text-center">
+            <a href="/reset-password" style="color: #212121">Забыли пароль?</a><br />
+
+            <MudButton @onclick="OnLogin" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" Style="width: 70%;">
+                Войти
+            </MudButton>
+        </div>
     </div>
 </div>
 
 @if (_isLoading)
 {
-    <div class="custom-overlay">
-        <MudProgressCircular Color="Color.Success" Indeterminate="true" Style="color: red !important;"/>
+    <div class="custom-overlay text-center">
+        <MudProgressCircular Color="Color.Secondary" Indeterminate="true" Size="Size.Large" />
     </div>
 }
 
-
 @code {
-    string userName;
-    string password;
+    string _userName = "996708362166";
+    string _password = "9900";
     private bool _isLoading = false;
+    AuthenticateResponse _currentUser = new AuthenticateResponse();
 
     //Стили
     string errorLogin = "display: none;";
@@ -59,25 +76,48 @@
     private async Task OnLogin()
     {
         _isLoading = true;
-        if (string.IsNullOrEmpty(userName))
+        StateHasChanged();
+        if (string.IsNullOrEmpty(_userName))
         {
             errorLogin = "display: block; color: red;";
             _isLoading = false;
             return;
         }
-        if (string.IsNullOrEmpty(password))
+        if (string.IsNullOrEmpty(_password))
         {
             errorPassword = "display: block; color: red;";
             _isLoading = false;
             return;
         }
-        await Task.Delay(5000);
-        UriHelper.NavigateTo("home");
+
+        //await Task.Delay(1500);
+        _currentUser = await LoginService.GetInstance().AuthenticateUser(userName: _userName, password: _password);
+
+        if (_currentUser.StatusCode == 200)
+        {
+            await SecureStorage.Default.SetAsync("UserAccessToken", _currentUser.AccessToken);
+            await SecureStorage.Default.SetAsync("UserId", _currentUser.UserId.ToString());
+            await SecureStorage.Default.SetAsync("UserName", _currentUser.UserName);
+
+            UriHelper.NavigateTo("home");
+        }
+        else
+        {
+            _isLoading = false;
+            OpenDialog(_currentUser.ResponseMessage);
+        }
     }
 
     private async Task CallAlert()
     {
         await JSRuntime.InvokeVoidAsync("testAlert");
+    }
+
+    private void OpenDialog(string responseMessage)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", responseMessage);
+        DialogService.Show<DialogUsageExample_Dialog>("Не удалось войти", parameters);
     }
 }
 
