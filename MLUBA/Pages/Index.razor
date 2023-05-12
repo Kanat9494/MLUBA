@@ -1,13 +1,14 @@
 ﻿@page "/home"
 
 <style>
+
     .custom-center {
-        position: absolute;
+        /*position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         width: 70px;
-        height: 70px;
+        height: 70px;*/
     }
 
     .custom-overlay {
@@ -50,6 +51,12 @@
 
         <h4>Наши доктора:</h4>
 
+        @if (_isLoading)
+        {
+            <div class="custom-center text-center">
+                <MudProgressCircular Color="Color.Success" Indeterminate="true" Size="Size.Large" />
+            </div>
+        }
 
         @foreach (var item in Doctors)
         {
@@ -72,13 +79,6 @@
                 </div>
             </a>
         }
-
-        @if (_isLoading)
-        {
-            <div class="custom-center text-center">
-                <MudProgressCircular Color="Color.Success" Indeterminate="true" Size="Size.Large" />
-            </div>
-        }
     </div>
 </div>
 
@@ -90,7 +90,6 @@
     protected override async Task OnInitializedAsync()
     {
         _accessToken = await SecureStorage.Default.GetAsync("UserAccessToken");
-
         await GetAllDoctors();
     }
 

@@ -1,0 +1,86 @@
+﻿@page "/fetch-products/{doctorId}";
+@inject NavigationManager UriHelper
+@inject IDialogService DialogService
+
+<style>
+    #bottom-nav {
+        display: none;
+    }
+</style>
+
+<div style="background: #00e600; height: 50px; margin: 0; display: flex; align-items: center;" class="fixed-top">
+    <a href="/home" style="float: left;">
+        <img style="width: 30px; height: 25px; margin-left: 8px;" src="images/icons/back_icon.png" />
+    </a>
+
+    <span style="white-space: nowrap; overflow: hidden; font-size: 18px; color: white; font-weight: bolder;
+        overflow: hidden; text-overflow: ellipsis;" class="ml-3">Консультация</span>
+</div>
+
+@if (_isBusy)
+{
+    <div class="text-center" style="margin-top: 60px;">
+        <MudProgressCircular Color="Color.Success" Indeterminate="true" Size="Size.Large" />
+    </div>
+}
+
+<h4 class="text-center" style="margin-top: 85px;">Выберите длительность консультации</h4>
+<p style="font-size: 17px;">В случае принятия вашего вызова врачем, с вашего баланса будет списана соответствующая сумма</p>
+
+@for (int i = 0; i < _products.Count(); i += 2)
+{
+    <div style="display: flex;">
+        @if (i < _products.Count())
+        {
+            var product = _products[i];
+            <div style="flex-basis: 40%; background: #ffd633; border-radius: 10px;" class="text-center ml-4 mr-2">
+                <p style="font-size: 18px; font-weight: bold;">@product.ProductName</p>
+                <p style="font-size: 16px;">@product.Price</p>
+            </div>
+        }
+        @if (i + 1 < _products.Count())
+        {
+            var product = _products[i + 1];
+            <div style="flex-basis: 40%; background: #ffd633; border-radius: 10px;" class="text-center ml-4 mr-2">
+                <p style="font-size: 18px; font-weight: bold;">@product.ProductName</p>
+                <p style="font-size: 16px;">@product.Price</p>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string DoctorId { get; set; }
+
+    private bool _isBusy = true;
+    private string _accessToken;
+    private List<Product> _products = new List<Product>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _accessToken = await SecureStorage.Default.GetAsync("UserAccessToken");
+
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        try
+        {
+            var response = await ContentService.Instance(_accessToken).GetItemsAsync<Product>("api/Product/GetProducts");
+
+            if (response != null)
+            {
+                foreach (var item in response)
+                    _products.Add(item);
+            }
+
+            _isBusy = false;
+        }
+        catch (Exception ex)
+        {
+            _isBusy = false;
+        }
+    }
+}

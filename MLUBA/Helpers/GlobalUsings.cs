@@ -7,6 +7,9 @@ global using MLUBA.Models.DTOs.Responses;
 global using System.Text;
 global using MLUBA.Services;
 global using MLUBA.Components;
+global using MudBlazor;
+global using MLUBA.Helpers;
+
 
 
 

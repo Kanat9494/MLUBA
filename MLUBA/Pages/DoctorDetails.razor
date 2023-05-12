@@ -1,5 +1,6 @@
 ﻿@page "/doctor-details/{doctorId}";
 @inject NavigationManager UriHelper
+@inject IDialogService DialogService
 
 <style>
     #bottom-nav {
@@ -7,7 +8,7 @@
     }
 </style>
 
-<div style="background: #00e600; height: 50px; margin: 0; display: flex; align-items: center;" class="ml-n4 mt-n4 mr-n4">
+<div style="background: #00e600; height: 50px; margin: 0; display: flex; align-items: center;" class="fixed-top">
     <a href="/home" style="float: left;">
         <img style="width: 30px; height: 25px; margin-left: 8px;" src="images/icons/back_icon.png" />
     </a>
@@ -16,7 +17,71 @@
         overflow: hidden; text-overflow: ellipsis;" class="ml-3">@_doctor.FullName</span>
 </div>
 
-<img src="@_doctor.ProfileImg" style="width: 100%; height: 300px;"/>
+@if (_isBusy)
+{
+    <div class="text-center" style="margin-top: 60px;">
+        <MudProgressCircular Color="Color.Success" Indeterminate="true" Size="Size.Large" />
+    </div>
+}
+
+<div style="height: 300px; margin: 0; align-items: center; clear: both;" class="ml-n4 mt-5 mr-n4">
+    <img src="@_doctor.ProfileImg" style="width: 100%; height: 300px;" />
+</div>
+
+<h2 class="mt-5" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@_doctor.FullName</h2>
+
+<hr style="background: #00e600;" />
+
+<div style="height: 50px; margin: 0; display: flex; align-items: center; justify-content: space-between;">
+    <h6 style="font-size: 17px;">Стаж работы</h6>
+    <h6 style="font-size: 17px; color: #00e600">@_doctor.WorkExperience</h6>
+</div>
+
+<hr style="background: #00e600;" class="mt-n1"/>
+
+<div style="height: 50px; margin: 0; display: flex; align-items: center; justify-content: space-between;">
+    <h6 style="font-size: 17px;">Специальность</h6>
+    <h6 style="font-size: 17px; color: #00e600">@_doctor.Specialization</h6>
+</div>
+
+<hr style="background: #00e600;" class="mt-n1" />
+
+<div style="height: 50px; margin: 0; display: flex; align-items: center; justify-content: space-between;">
+    <h6 style="font-size: 17px;">Статус</h6>
+    @*<p style="font-size: 17px; color: @(_doctor.IsOnline.Equals("В сети") ? "#00e600" : "red")">@_doctor.IsOnline</p>*@
+    @*<p style="@($"font-size: 17px; color: {((_doctor.IsOnline.Equals("В сети")) ? "#00e600" : "red")}")">te</p>*@
+    <h6 style="font-size: 17px; color: @statusColor">@_doctor.IsOnline</h6>
+</div>
+
+<hr style="background: #00e600;" class="mt-n1" />
+
+<div style="height: 50px; margin: 0; display: flex; align-items: center; justify-content: space-between;">
+    <h6 style="font-size: 17px;">Статус для консультации</h6>
+    <h6 style="font-size: 17px; color: @busyColor">@_doctor.IsBusy</h6>
+</div>
+
+<hr style="background: #00e600;" class="mt-n1" />
+
+<div style="height: 50px; margin: 0; display: flex; align-items: center; justify-content: space-between;">
+    <h6 style="font-size: 17px;">Работа</h6>
+</div>
+
+<div style="border-radius: 12px; background: #ffcc80; padding: 12px;">
+    <p>@_doctor.AboutDoctor</p>
+</div>
+
+<div style="margin-bottom: 75px;">
+</div>
+
+<div class="fixed-bottom text-center">
+    <MudButton @onclick="Consultation" Variant="Variant.Filled" Color="Color.Primary" Class="mb-2 ml-1 mr-3" Style="width: 40%; background: #00e600">
+        Консультация
+    </MudButton>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mb-2 mr-1" Style="width: 40%;">
+        Записаться
+    </MudButton>
+</div>
 
 @code {
     [Parameter]
@@ -24,6 +89,9 @@
 
     private string _accessToken;
     private DoctorInfo _doctor = new DoctorInfo();
+    string statusColor = "#00e600";
+    string busyColor = "#00e600";
+    bool _isBusy = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -33,16 +101,48 @@
 
     async Task GetDoctorInfoAsync()
     {
-        var response = await ContentService.Instance(_accessToken).GetItemAsync<DoctorInfo>($"api/Doctors/GetDoctor/{DoctorId}");
-        await SecureStorage.Default.SetAsync("DoctorId", DoctorId.ToString());
-
-        if (response.StatusCode == 200)
+        try
         {
-            _doctor = response;
-            await SecureStorage.Default.SetAsync("DoctorAccountName", response.AccountName);
-            await SecureStorage.Default.SetAsync("DoctorFullName", response.FullName);
+            var response = await ContentService.Instance(_accessToken).GetItemAsync<DoctorInfo>($"api/Doctors/GetDoctor/{DoctorId}");
+            await SecureStorage.Default.SetAsync("DoctorId", DoctorId.ToString());
+
+            if (response.StatusCode == 200)
+            {
+                _doctor = response;
+                if (!_doctor.IsOnline.Equals("В сети"))
+                    statusColor = "red";
+                if (!_doctor.IsBusy.Equals("Свободен"))
+                    busyColor = "red";
+                _isBusy = false;
+                await SecureStorage.Default.SetAsync("DoctorAccountName", response.AccountName);
+                await SecureStorage.Default.SetAsync("DoctorFullName", response.FullName);
+            }
+            else if (response.StatusCode == 401)
+                UriHelper.NavigateTo("/");
         }
-        else if (response.StatusCode == 401)
-            UriHelper.NavigateTo("/");
+        catch
+        {
+            _isBusy = false;
+        }
+    }
+
+    void Consultation()
+    {
+        if (!_doctor.IsOnline.Equals("В сети"))
+            OpenDialog("В данный момент выбранный врач не в сети");
+        else
+        {
+            if (!_doctor.IsBusy.Equals("Свободен"))
+                OpenDialog("В данный момент выбранный врач консультирует");
+            else
+                UriHelper.NavigateTo($"fetch-products/{DoctorId}");
+        }
+    }
+
+    private void OpenDialog(string responseMessage)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", responseMessage);
+        DialogService.Show<DialogUsageExample_Dialog>("Не в сети", parameters);
     }
 }
