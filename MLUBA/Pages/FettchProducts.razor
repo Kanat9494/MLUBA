@@ -29,21 +29,23 @@
 
 @for (int i = 0; i < _products.Count(); i += 2)
 {
-    <div style="display: flex;">
+    <div style="display: flex; justify-content: center; ">
         @if (i < _products.Count())
         {
             var product = _products[i];
-            <div style="flex-basis: 40%; background: #ffd633; border-radius: 10px;" class="text-center ml-4 mr-2">
-                <p style="font-size: 18px; font-weight: bold;">@product.ProductName</p>
-                <p style="font-size: 16px;">@product.Price</p>
-            </div>
+            <a href="/offer/@_products[i].Price">
+                <div style="flex-basis: 40%; background: #ffd633; border-radius: 10px; padding: 0;" class="text-center mb-2 mr-2">
+                    <p style="font-size: 18px; font-weight: bold;" class="mt-2">@product.ProductName</p>
+                    <p style="font-size: 16px; margin-bottom: 5px;" class="mt-n2">@product.Price сом</p>
+                </div>
+            </a>
         }
         @if (i + 1 < _products.Count())
         {
             var product = _products[i + 1];
-            <div style="flex-basis: 40%; background: #ffd633; border-radius: 10px;" class="text-center ml-4 mr-2">
-                <p style="font-size: 18px; font-weight: bold;">@product.ProductName</p>
-                <p style="font-size: 16px;">@product.Price</p>
+            <div style="flex-basis: 40%; background: #ffd633; border-radius: 10px; padding: 0;" class="text-center mb-2">
+                <p style="font-size: 18px; font-weight: bold;" class="mt-2">@product.ProductName</p>
+                <p style="font-size: 16px; margin-bottom: 5px;" class="mt-n2">@product.Price сом</p>
             </div>
         }
     </div>
