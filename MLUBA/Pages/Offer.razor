@@ -11,8 +11,6 @@
 
 <h2>@OfferPrice</h2>
 
-<MudButton @onclick="Op">Op</MudButton>
-
 @code {
     [Parameter]
     public string OfferPrice { get; set; }
@@ -22,8 +20,11 @@
         await JS.InvokeVoidAsync("clearNavigationStack");
     }
 
-    async void Op()
+    private async Task OnPopState()
     {
-        await JS.InvokeVoidAsync("clearNavigationStack");
+        bool confirmResult = await JS.InvokeAsync<bool>("displayConfirm", "Вы хотите прервать?");
+
+        if (confirmResult)
+            return;
     }
 }
