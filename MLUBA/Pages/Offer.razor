@@ -1,0 +1,29 @@
+﻿@page "/offer/{OfferPrice}";
+@inject IJSRuntime JS
+
+<style>
+    #bottom-nav {
+        display: none;
+    }
+</style>
+
+<h3>Offer</h3>
+
+<h2>@OfferPrice</h2>
+
+<MudButton @onclick="Op">Op</MudButton>
+
+@code {
+    [Parameter]
+    public string OfferPrice { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await JS.InvokeVoidAsync("clearNavigationStack");
+    }
+
+    async void Op()
+    {
+        await JS.InvokeVoidAsync("clearNavigationStack");
+    }
+}
